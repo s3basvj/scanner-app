@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
   },
   cacheComponents: true,
   partialPrefetching: true,
+  allowedDevOrigins: ['schizogenetically-presentable-richelle.ngrok-free.dev'],
   turbopack: {
     rules: {
       "*.css": {

@@ -1,26 +1,109 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /*
+   * "Epson scanner housing" palette: off-white with molded grays.
+   * The whole UI draws from these tokens (mapped in `@theme` below).
+   */
+  --background: #f4f2ec; /* off-white: scanner body */
+  --surface: #ffffff; /* paper: cards and panels */
+  --surface-muted: #eae7de; /* light housing gray */
+  --border: #dbd7cc; /* housing seams */
+  --foreground: #23211c; /* ink */
+  --muted-foreground: #5c584f; /* secondary text (AA on off-white) */
+  --accent: #0a4b9c; /* Epson blue */
+  --accent-hover: #083c80;
+  --accent-bright: #4f9bff; /* accent readable on the dark viewfinder */
+  color-scheme: light;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-line: var(--border);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-bright: var(--accent-bright);
+  --shadow-viewfinder: 0 30px 60px -35px rgba(35, 33, 28, 0.55);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family:
+    var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+}
+
+/* App background: subtle Epson blue glow + fine scan grid over off-white. */
+.app-background {
+  background-image:
+    radial-gradient(
+      ellipse 90% 55% at 50% -10%,
+      color-mix(in srgb, var(--accent) 7%, transparent),
+      transparent 65%
+    ),
+    linear-gradient(color-mix(in srgb, var(--foreground) 4%, transparent) 1px, transparent 1px),
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--foreground) 4%, transparent) 1px,
+      transparent 1px
+    );
+  background-size:
+    100% 100%,
+    44px 44px,
+    44px 44px;
+  background-position: center top;
+}
+
+/*
+ * Framing grid (thirds) inside the camera viewfinder.
+ * The viewfinder stays dark (live video / photo), so the lines
+ * stay light to keep legibility over the image.
+ */
+.doc-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+  background-size:
+    33.333% 33.333%,
+    33.333% 33.333%;
+  background-position: center;
+}
+
+/* Scan line: signals that the camera is active (over the dark viewfinder). */
+.scan-line {
+  position: absolute;
+  right: 0;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent-bright), transparent);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--accent-bright) 60%, transparent);
+  animation: scan-sweep 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes scan-sweep {
+  from {
+    top: 6%;
+  }
+  to {
+    top: 94%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scan-line {
+    animation: none;
+    top: 50%;
+    opacity: 0.55;
+  }
 }
